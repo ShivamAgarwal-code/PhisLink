@@ -1,0 +1,106 @@
+# @contact isn't being printed to the generated-schema.graphql file
+# See https://github.com/apollographql/federation/issues/1847
+directive @contact(
+  "Contact title of the subgraph owner"
+  name: String!
+  "URL where the subgraph's owner can be reached"
+  url: String
+  "Other relevant notes can be included here; supports markdown links"
+  description: String
+) on SCHEMA
+
+extend schema
+  @contact(
+    name: "Thing Server Team"
+    url: "https://myteam.slack.com/archives/teams-chat-room-url"
+    description: "send urgent issues to [#oncall](https://yourteam.slack.com/archives/oncall)."
+  )
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.3",
+    import: [
+      "@key", "@extends", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires", "@tag",
+      "@composeDirective", "@interfaceObject"
+    ]
+  )
+
+type Query {
+  _dummy: String
+}
+
+  type Mutation {
+    "Mutate threats array"
+    ThreatData(url: String!, clientId: String!, clientVersion: String!, threatTypes: [String!], platformTypes: [String!], threatEntryTypes: [String!]): ThreatDataResponse
+  }
+   
+  type ThreatDataResponse {
+    "Similar to HTTP status code, represents the status of the mutation"
+    code: Int!
+    "Indicates whether the mutation was successful"
+    success: Boolean!
+    "Human-readable message for the UI"
+    message: String!
+    "The threat list matches."
+    matches: [Matches]
+  }
+
+  type Matches {
+    "The threat type matching this threat."
+    threatType: ThreatType
+    "The platform type matching this threat."
+    platformType: PlatformType
+    "The threat matching this threat."
+    threat: Threat
+    "The cache lifetime for the returned match"
+    cacheDuration: String
+    "The threat entry type matching this threat."
+    threatEntryType: ThreatEntryType
+  }
+
+  type Threat {
+    "URL String of Threat Entry"
+    url: String
+  }
+
+   enum ThreatType {
+    "Unknown."
+    THREAT_TYPE_UNSPECIFIED
+    "Malware threat type."
+    MALWARE
+    "Social engineering threat type."
+    SOCIAL_ENGINEERING
+    "Unwanted software threat type."
+    UNWANTED_SOFTWARE
+    "Potentially harmful application threat type."
+    POTENTIALLY_HARMFUL_APPLICATION
+   }
+
+   enum PlatformType {
+    "Unknown platform."
+    PLATFORM_TYPE_UNSPECIFIED
+    "Threat posed to Windows."
+    WINDOWS
+    "Threat posed to Linux."
+    LINUX
+    "Threat posed to Android."
+    ANDROID
+    "Threat posed to OS X."
+    OSX
+    "Threat posed to iOS."
+    IOS
+    "Threat posed to at least one of the defined platforms."
+    ANY_PLATFORM
+    "Threat posed to all defined platforms."
+    ALL_PLATFORMS
+    "Threat posed to Chrome."
+    CHROME
+   }
+
+   enum ThreatEntryType {
+    "Unspecified."
+    THREAT_ENTRY_TYPE_UNSPECIFIED
+    "	A URL."
+    URL
+    "An executable program."
+    EXECUTABLE
+   }
+
